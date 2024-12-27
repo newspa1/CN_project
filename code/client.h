@@ -17,6 +17,7 @@
 #define HOMEDIR "home/"
 
 using namespace std;
+namespace fs = std::filesystem;
 
 int clientSocket;
 bool isLogin;
@@ -26,7 +27,7 @@ void ResponseHandling(string response);
 void Registration();
 void Login();
 void Logout();
-
+void ListFilesInDirectory(vector<string>& arguments);
 void MessageCommand();
 void TransferFileCommand(string filename);
 

@@ -24,6 +24,7 @@
 #define TMPFILE "tmpfile"
 
 using namespace std;
+namespace fs = std::filesystem;
 
 struct ClientData {
     int clientSocket;
@@ -48,7 +49,7 @@ void Registration(string message, ClientData *clientdata);
 void Login(string message, ClientData *clientdata);
 void Logout(ClientData *clientdata);
 
-void MessageCommand2(vector<string> arguments, ClientData *clientdata);
+void ListFilesInDirectory(const string& path, ClientData *clientdata);
 void MessageCommand(vector<string> arguements, ClientData *clientdata);
 pair<string, ClientData*> MessageCommandSender(string username, ClientData *clientdata);
 void ReceiveHandler(ClientData *clientdata);

@@ -57,6 +57,8 @@ void ResponseHandling(string response) {
         Login();
     } else if(command == "Message") {
         MessageCommand();
+    } else if(command == "List") {
+        ListFilesInDirectory(arguments);
     } else if(command == "TransferFile") {
         string filename = arguments[1];
         TransferFileCommand(filename);
@@ -69,9 +71,9 @@ void ResponseHandling(string response) {
         FileReceive(filename, sender); 
     } else { // Nothing
         if(isLogin) {
-            cout << Username << ":$ ";
+            cout << Username << ":~$(registration/logout/message/ls/transfer) > ";
         } else {
-            cout << "registration or login: ";
+            cout << "Please enter the command (registration/login/logout): ";
         }
         string message;
         getline(cin, message);
@@ -79,9 +81,16 @@ void ResponseHandling(string response) {
     }
 }
 
+void ListFilesInDirectory(vector<string>& arguments) {
+    for(int i = 1; i < arguments.size(); i++) {
+        cout << "> " << arguments[i] << '\n';
+    }
+    NotifyServer();
+}
+
 void TransferFileCommand(string filename) {
     ifstream file;
-    file.open(filename, ios::binary);
+    file.open(HOMEDIR + Username + '/' + filename, ios::binary);
 
     // Check file exists or not
     bool exist = true;
@@ -148,6 +157,10 @@ void Login() {
 }
 
 void Logout() {
+	if(!isLogin) { // Exit from process
+		exit(0);
+	}
+
     string message;
     cout << "Logout.\n";
     isLogin = false;

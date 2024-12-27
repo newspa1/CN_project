@@ -55,7 +55,7 @@ void MessageHandling(string message, ClientData *clientdata) {
 		SSL_write(clientdata->clientssl, type.c_str(), type.size());
 	} else {
 		string command = arguments[0];
-		cout << "command = " << command << "====\n";
+		cout << "command = " << command << "\n";
 		if(command == "registration") {
 			Registration(message, clientdata);
 		} else if(command == "login") {
@@ -64,6 +64,9 @@ void MessageHandling(string message, ClientData *clientdata) {
 			Logout(clientdata);
 		} else if(command == "message") {
 			MessageCommand(arguments, clientdata);
+		} else if(command == "ls") {
+			string path = "home/" + clientdata->username;
+			ListFilesInDirectory(path, clientdata);
 		} else if(command == "transfer") {
 			TransferCommand(arguments, clientdata);
 			string type = "Nothing";
@@ -74,6 +77,14 @@ void MessageHandling(string message, ClientData *clientdata) {
 			SSL_write(clientdata->clientssl, type.c_str(), type.size());
 		}
 	}
+}
+
+void ListFilesInDirectory(const string& path, ClientData *clientdata) {
+	string response = "List";
+    for (const auto& entry : fs::directory_iterator(path)) {
+        response = response + ' ' + entry.path().filename().string(); // Insert the filename
+    }
+	SSL_write(clientdata->clientssl, response.c_str(), response.size());
 }
 
 void TransferCommand(vector<string> arguments, ClientData *clientdata) {
@@ -155,7 +166,7 @@ void Registration(string message, ClientData *clientdata) {
 	if(!isUserExist(string(username))) {
 		AddUser(string(username));
 		cout << "Registreation success. Username: " << username << "\n";
-
+		fs::create_directory(HOMEDIR + string(username));
 		bool status = true;
 		SSL_write(clientdata->clientssl, &status, sizeof(status));
 
@@ -200,13 +211,14 @@ void Login(string message, ClientData *clientdata) {
 }
 
 void Logout(ClientData *clientdata) {
-	if(!clientdata->isLogin) {
+	/*if(!clientdata->isLogin) {
 		string type = "Nothing";
     	SSL_write(clientdata->clientssl, type.c_str(), type.size());
 		return;
 	}
 
 	ClientOnlineMap.erase(clientdata->username); // Remove clients' online status
+	*/
 	clientdata->username = "";
 	clientdata->isLogin = false;
 
